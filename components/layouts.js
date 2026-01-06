@@ -24,7 +24,7 @@ const Layout = ({ children }) => {
 
   if (isLoginPage) {
     return (
-      <main className="min-h-screen bg-white">
+      <main className="min-h-screen flex-1">
         {children}
       </main>
     );
@@ -32,12 +32,12 @@ const Layout = ({ children }) => {
 
  
   return (
-    <div className="min-h-screen bg-white flex">
+    <div className="w-full flex flex-1">
       <SidePannel setOpenTab={setOpenTab} openTab={openTab} />
 
       <div className="flex-1 xl:pl-70 md:pl-62.5 sm:pl-50">
         <Navbar setOpenTab={setOpenTab} openTab={openTab} />
-        <main className="">{children}</main>
+        <main className="flex-1">{children}</main>
       </div>
     </div>
   );

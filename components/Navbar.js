@@ -20,7 +20,6 @@ const Navbar = ({ setOpenTab, openTab }) => {
     router.push("/login");
   };
 
-
   const handleLogout = () => {
     Swal.fire({
       text: "Are you sure you want to logout?",

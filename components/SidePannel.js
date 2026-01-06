@@ -74,7 +74,7 @@ const SidePannel = ({ setOpenTab, openTab }) => {
     },
     {
       href: "/billingPage",
-      title: "Billing",
+      title: "Payment History",
       img: <MdCreditCard size={25} />,
      access: ["Admin"],
     },

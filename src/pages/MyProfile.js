@@ -187,10 +187,7 @@ function MyProfile(props) {
         });
         setIsEditingPassword(false);
         setSubmitted(false);
-        // Optional: redirect to login after successful password change
-        // setTimeout(() => {
-        //   router.push("/login");
-        // }, 1500);
+       
       } else {
         toast.error(res?.data?.message || "Failed to change password");
       }
@@ -204,7 +201,7 @@ function MyProfile(props) {
 
   return (
     <div className="min-h-screen bg-black py-8 px-4">
-      {/* Background Pattern */}
+      
       <div className="fixed inset-0 pointer-events-none -z-10">
         <div
           className="absolute inset-0 opacity-20"
@@ -217,11 +214,7 @@ function MyProfile(props) {
       </div>
 
       <div className="w-full max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="text-center ">
-          {/* <p className="text-gray-100 text-2xl ">Manage your account information</p> */}
-        </div>
-
+      
         <div className="space-y-6 ">
           <div className="min-h-[600px] bg-custom-black border border-green-500/20 rounded-3xl p-4 md:p-8">
             <p className="text-custom-yellow font-bold text-2xl text-center">My Profile</p>
