@@ -32,7 +32,7 @@ const Layout = ({ children }) => {
 
  
   return (
-    <div className="w-full flex flex-1">
+    <div className="min-h-screen bg-white flex flex-col">
       <SidePannel setOpenTab={setOpenTab} openTab={openTab} />
 
       <div className="flex-1 xl:pl-70 md:pl-62.5 sm:pl-50">

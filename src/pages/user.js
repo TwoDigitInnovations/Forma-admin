@@ -8,38 +8,22 @@ import {
   CreditCard,
   Receipt,
   Search,
+  MapPin,
+  CalendarClock,
+  Projector,
 } from "lucide-react";
 import { Api } from "@/services/service";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
-
-const mockBillingHistory = [
-  {
-    _id: "1",
-    amount: 98,
-    currency: "USD",
-    billingType: "monthly",
-    paymentStatus: "success",
-    transactionId: "TXN123456789",
-    paidAt: "2026-01-05T04:59:47.254+00:00",
-  },
-  {
-    _id: "2",
-    amount: 98,
-    currency: "USD",
-    billingType: "monthly",
-    paymentStatus: "success",
-    transactionId: "TXN987654321",
-    paidAt: "2025-12-05T04:59:47.254+00:00",
-  },
-];
 
 function User(props) {
   const [allUser, setAllUser] = useState();
   const [selectedOrg, setSelectedOrg] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [billingDetails, setBillingDetails] = useState([]);
+  const [lastPayment, setLastPayment] = useState({});
   const router = useRouter();
+  const [allProject, setAllProject] = useState([]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -62,26 +46,26 @@ function User(props) {
     getAllUsers();
   }, [searchQuery]);
 
-const getAllUsers = async () => {
-  props.loader(true);
+  const getAllUsers = async () => {
+    props.loader(true);
 
-  let url = `auth/getAllUser?role=User`;
+    let url = `auth/getAllUser?role=User`;
 
-  if (searchQuery?.trim()) {
-    url += `&search=${encodeURIComponent(searchQuery)}`;
-  }
-
-  Api("get", url, "", router).then(
-    (res) => {
-      props.loader(false);
-      setAllUser(res.data?.data);
-    },
-    (err) => {
-      props.loader(false);
-      toast.error(err?.message);
+    if (searchQuery?.trim()) {
+      url += `&search=${encodeURIComponent(searchQuery)}`;
     }
-  );
-};
+
+    Api("get", url, "", router).then(
+      (res) => {
+        props.loader(false);
+        setAllUser(res.data?.data);
+      },
+      (err) => {
+        props.loader(false);
+        toast.error(err?.message);
+      }
+    );
+  };
 
   const fetchPaymentHistory = async (id) => {
     try {
@@ -92,9 +76,38 @@ const getAllUsers = async () => {
         router
       );
       setBillingDetails(res?.data.payments || []);
-      
+      setLastPayment(res?.data.payments[0] || {});
     } catch (err) {
       toast.error(err.message || "Failed to load billing history");
+    }
+  };
+
+  const fetchAllPRoject = async (id) => {
+    props.loader(true);
+    try {
+      const res = await Api(
+        "get",
+        `project/getAllProjectforAdmin?userId=${id}`,
+        {},
+        router
+      );
+      setAllProject(res?.data.data || []);
+      props.loader(false);
+    } catch (err) {
+      toast.error(err.message || "Failed to load billing history");
+    }
+  };
+  const getStatusBadge = (status) => {
+    const baseClasses = "px-3 py-1 rounded-full text-xs font-medium";
+    switch (status) {
+      case "Planning":
+        return `${baseClasses} text-[#e0f349] bg-[#e0f349]/20`;
+      case "In Progress":
+        return `${baseClasses} text-[#00bcd4] bg-[#00bcd4]/20`;
+      case "Completed":
+        return `${baseClasses} text-[#4caf50] bg-[#4caf50]/20`;
+      default:
+        return `${baseClasses} text-gray-400 bg-gray-700`;
     }
   };
 
@@ -110,12 +123,13 @@ const getAllUsers = async () => {
 
   const handleViewDetails = (org) => {
     setSelectedOrg(org);
-    fetchPaymentHistory(org._id)
+    fetchPaymentHistory(org._id);
+    fetchAllPRoject(org._id)
     // setBillingDetails(mockBillingHistory);
   };
 
   return (
-    <div className="min-h-screen bg-black p-6">
+    <div className="min-h-screen bg-black p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-white">Users</h1>
@@ -224,7 +238,7 @@ const getAllUsers = async () => {
                       <td className="px-6 py-2.5 text-center">
                         <button
                           onClick={() => handleViewDetails(org)}
-                          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/20 border border-blue-500/30 rounded-lg hover:bg-blue-500/30 transition-colors text-blue-400 font-medium"
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/20 border border-blue-500/30 rounded-lg hover:bg-blue-500/30 transition-colors text-blue-400 font-medium cursor-pointer"
                         >
                           <Eye className="w-4 h-4" />
                           View Details
@@ -240,13 +254,18 @@ const getAllUsers = async () => {
 
         {selectedOrg && (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-            <div className="bg-custom-black rounded-2xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="bg-custom-black rounded-2xl p-3 md:p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-100">
                   User Details
                 </h2>
                 <button
-                  onClick={() => setSelectedOrg(null)}
+                onClick={() => {
+                    setSelectedOrg(null);
+                    setAllProject([]);
+                    setLastPayment({});
+                    setBillingDetails([]);
+                  }}
                   className="p-2 hover:bg-gray-800 rounded-full transition-colors"
                 >
                   <X className="w-6 h-6 text-gray-400" />
@@ -295,13 +314,13 @@ const getAllUsers = async () => {
 
                 <Card title="Billing Cycle" icon={Calendar}>
                   <p className="text-xl font-bold text-white capitalize mb-1">
-                    {selectedOrg.subscription?.billingType}
+                    {lastPayment?.billingType}
                   </p>
                   <p className="text-sm text-gray-400">
                     $
-                    {selectedOrg.subscription?.billingType === "monthly"
-                      ? selectedOrg.subscription?.priceMonthly
-                      : selectedOrg.subscription?.priceYearly}{" "}
+                    {lastPayment?.billingType === "monthly"
+                      ? lastPayment.planId?.priceMonthly
+                      : lastPayment.planId?.priceYearly}{" "}
                     per{" "}
                     {selectedOrg.subscription?.billingType === "monthly"
                       ? "month"
@@ -312,16 +331,15 @@ const getAllUsers = async () => {
                 <Card title="Total Amount" icon={CreditCard}>
                   <p className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                     $
-                    {(selectedOrg.subscription?.billingType === "monthly"
-                      ? selectedOrg.subscription?.priceMonthly
-                      : selectedOrg.subscription?.priceYearly) *
-                      selectedOrg.subscription?.teamSize}
+                    {/* {(selectedOrg.subscription?.billingType === "monthly"
+                                      ? selectedOrg.subscription?.priceMonthly
+                                      : selectedOrg.subscription?.priceYearly) *
+                                      selectedOrg.subscription?.teamSize} */}
+                    {lastPayment?.amount}
                   </p>
                   <p className="text-xs text-gray-500 mt-1">
                     per{" "}
-                    {selectedOrg.subscription?.billingType === "monthly"
-                      ? "month"
-                      : "year"}
+                    {lastPayment?.billingType === "monthly" ? "month" : "year"}
                   </p>
                 </Card>
 
@@ -399,6 +417,68 @@ const getAllUsers = async () => {
                           <span className="inline-block text-xs px-3 py-1 rounded-full bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-400 border border-green-500/30 capitalize font-medium">
                             {item.paymentStatus}
                           </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-8 bg-gray-800/50 border border-gray-700 rounded-2xl p-4 shadow-xl">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-2 rounded-lg bg-blue-500/20 border border-blue-500/30">
+                    <Projector className="w-5 h-5 text-blue-400" />
+                  </div>
+                  <h3 className="text-2xl font-semibold text-white">
+                    All Projects
+                  </h3>
+                </div>
+
+                {allProject.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Projector className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                    <p className="text-gray-400">No project found</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {allProject.map((project, key) => (
+                      <div
+                        key={key}
+                        className="flex justify-between items-center border border-gray-700/50 rounded-xl p-4 hover:border-gray-600/50 transition-all duration-300 bg-gradient-to-r from-gray-800/30 to-gray-700/20"
+                      >
+                        <div className="flex flex-col gap-4">
+                          {/* Top Section */}
+                          <div className="flex flex-col md:flex-row md:justify-between gap-4">
+                            {/* Left Content */}
+                            <div className="flex flex-col gap-2">
+                              <div className="flex flex-wrap items-center gap-3">
+                                <h3 className="text-lg font-semibold text-white">
+                                  {project?.projectName}
+                                </h3>
+                                <span
+                                  className={getStatusBadge(project?.status)}
+                                >
+                                  {project?.status}
+                                </span>
+                              </div>
+
+                              <div className="flex flex-col gap-2 text-sm text-white">
+                                <div className="flex items-center gap-1">
+                                  <MapPin size={18} />
+                                  <span>{project?.location}</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <CalendarClock size={18} />
+                                  <span>
+                                    Last Updated:{" "}
+                                    {new Date(
+                                      project?.updatedAt
+                                    ).toLocaleString()}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     ))}

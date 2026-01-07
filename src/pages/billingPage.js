@@ -75,7 +75,7 @@ function billingPage(props) {
   };
 
   return (
-    <div className="min-h-screen bg-black p-6">
+    <div className="min-h-screen bg-black p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-white">Payments</h1>
@@ -176,13 +176,13 @@ function billingPage(props) {
                         <span
                           className={`px-3 py-1 rounded-full text-sm font-medium `}
                         >
-                          {org.planId?.planName}
+                          {org.planId?.name}
                         </span>
                       </td>
                       <td className="px-6 py-2.5 text-center">
                         <button
                           onClick={() => handleViewDetails(org)}
-                          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/20 border border-blue-500/30 rounded-lg hover:bg-blue-500/30 transition-colors text-blue-400 font-medium"
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/20 border border-blue-500/30 rounded-lg hover:bg-blue-500/30 transition-colors text-blue-400 font-medium cursor-pointer"
                         >
                           <Eye className="w-4 h-4" />
                           View Details
@@ -201,7 +201,7 @@ function billingPage(props) {
             <div className="bg-custom-black rounded-2xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-100">
-                  Plan Details
+                  Payment Details
                 </h2>
                 <button
                   onClick={() => setSelectedOrg(null)}
@@ -210,6 +210,51 @@ function billingPage(props) {
                   <X className="w-6 h-6 text-gray-400" />
                 </button>
               </div>
+
+              <div className="mb-6 p-4 bg-gray-800/50 border border-gray-700 rounded-xl">
+                <h3 className="text-lg font-semibold text-white mb-3">
+                  Customer Information
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-gray-400">Name</p>
+                    <p className="text-white font-medium">
+                      {selectedOrg.userId.name || "—"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-gray-400">Email</p>
+                    <p className="text-white font-medium">
+                      {selectedOrg.userId.email || "_"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-gray-400">Phone</p>
+                    <p className="text-white font-medium">
+                      {selectedOrg.userId.phone || "_"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-gray-400">Ragister Date.</p>
+                    <p className="text-white font-medium">
+                      {new Date(selectedOrg.userId.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-gray-400">Customer Status</p>
+                    <span className="inline-block px-3 py-1 text-sm rounded-full bg-green-500/20 text-green-400">
+                      {selectedOrg.userId?.status}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+
               <div className="mb-6 p-4 bg-gray-800/50 border border-gray-700 rounded-xl">
                 <h3 className="text-lg font-semibold text-white mb-3">
                   Payment Information
@@ -240,7 +285,7 @@ function billingPage(props) {
                   <div>
                     <p className="text-sm text-gray-400">Subscription Status</p>
                     <span className="inline-block px-3 py-1 text-sm rounded-full bg-green-500/20 text-green-400">
-                      {selectedOrg.subscription?.status}
+                      {selectedOrg.userId.subscription?.status}
                     </span>
                   </div>
                 </div>
@@ -250,8 +295,7 @@ function billingPage(props) {
                   <div>
                     <p className="text-sm text-gray-400">Plan Name</p>
                     <p className="text-white font-medium">
-                      {selectedOrg.planId?.name ||
-                        selectedOrg.subscription?.planName}
+                      {selectedOrg.planId?.name}
                     </p>
                   </div>
 
@@ -279,7 +323,7 @@ function billingPage(props) {
                   <div>
                     <p className="text-sm text-gray-400">Teams Used</p>
                     <p className="text-white font-medium">
-                      {selectedOrg.subscription?.usedTeamsSize}
+                      {selectedOrg.userId.subscription?.usedTeamsSize}
                     </p>
                   </div>
                 </div>
