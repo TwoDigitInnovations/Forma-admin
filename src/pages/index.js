@@ -72,7 +72,7 @@ function AdminDashboard(props) {
     }
   };
 
-  const COLORS = ["#FFD700", "#FFA500", "#FF8C00"];
+  const COLORS = ["#dff34940", "#e0f349"];
 
   // if (loading) {
   //   return (
@@ -192,7 +192,7 @@ function AdminDashboard(props) {
                 </Pie>
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "#1a1a1a",
+                    backgroundColor: "#e0f349",
                     border: "1px solid #FFD700",
                   }}
                 />
@@ -216,10 +216,10 @@ function AdminDashboard(props) {
                   backgroundColor: "#1a1a1a",
                   border: "1px solid #FFD700",
                 }}
-                labelStyle={{ color: "#FFD700" }}
+                labelStyle={{ color: "#e0f349" }}
               />
               <Legend />
-              <Bar dataKey="revenue" fill="#FFD700" name="Revenue ($)" />
+              <Bar dataKey="revenue" fill="#e0f349" name="Revenue ($)" />
             </BarChart>
           </ResponsiveContainer>
         </div>
